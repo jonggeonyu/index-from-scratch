@@ -1,5 +1,6 @@
 from tools import make_data
 import time
+import random
 
 def insert(table, rec):
     table.append(rec)
@@ -25,3 +26,16 @@ def measure_insert(n):
         insert(table, rec)
     end = time.perf_counter()
     return end-start
+
+def measure_select_eq(n):
+    table = make_data(n)
+    keys = []
+    for i in range(1000):
+        keys.append(random.randint(0,n-1))
+    start = time.perf_counter()
+    for i in range(1000):
+        select_eq(table, keys[i])
+    end = time.perf_counter()
+    return (end-start)/1000
+
+
