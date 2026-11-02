@@ -38,4 +38,13 @@ def measure_select_eq(n):
     end = time.perf_counter()
     return (end-start)/1000
 
-
+def measure_select_range(n):
+    table = make_data(n)
+    keys = []
+    for i in range(1000):
+        keys.append(random.randint(0,n-101))
+    start = time.perf_counter()
+    for i in range(1000):
+        select_range(table, keys[i], keys[i]+100)
+    end = time.perf_counter()
+    return (end-start)/1000
