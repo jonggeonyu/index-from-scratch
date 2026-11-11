@@ -21,3 +21,12 @@ def select_eq(table, key):
         if key == rec[0]:
             return rec
     return None
+
+def select_range(table, low, high):
+    m = len(table)
+    lst = []
+    for key in range(low, high, 1):
+        for rec in table[key%m]:
+            if rec[0] == key:
+                lst.append(rec)
+    return lst
