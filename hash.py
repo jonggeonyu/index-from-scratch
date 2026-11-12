@@ -4,13 +4,23 @@ import time
 
 def make_table(m):
     buckets = []
-    for i in range(m):
+    for _ in range(m):
         buckets.append([])
     return buckets
 
 def insert(table, rec):
     m = len(table)
     table[rec[0]%m].append(rec)
+
+def measure_insert(n):
+    data = make_data(n)
+    buckets = make_table(n)
+    start = time.perf_counter()
+    for rec in data:
+        insert(buckets, rec)
+    end = time.perf_counter()
+    print(f"{n}개 : {end - start}")
+
 
 def select_eq(table, key):
     m = len(table)
