@@ -31,7 +31,6 @@ def select_range(table, low, high):
                 lst.append(rec)
     return lst
 
-
 def measure_insert(n):
     data = make_data(n)
     buckets = make_table(n)
@@ -55,3 +54,16 @@ def measure_select_eq(n):
     end = time.perf_counter()
     print(f"{n}개 : {(end-start)/1000}")
 
+def measure_select_range(n):
+    buckets = make_table(n)
+    lst = make_data(n)
+    for rec in lst:
+        insert(buckets, rec)
+    keys = []
+    for _ in range(1000):
+        keys.append(random.randint(0, n))
+    start = time.perf_counter()
+    for i in range(1000):
+        lst = select_range(buckets, 0, n)
+    end = time.perf_counter()
+    print(f"{n}개 : {(end-start)/1000}")
