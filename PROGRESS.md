@@ -1,7 +1,9 @@
 # 진행 기록
 
 ## 현재 위치
-- **2단계 (해시) 진행 중:** insert, select_eq, select_range를 구현하고 측정했다. 남은 것은 `dict`(방식 B)와의 비교다.
+- **2단계 (해시) 완료, 3단계 (B+트리) 시작 전**
+- 순서를 바꿨다: 3단계 B+트리(학습자 구현) → 4단계 B-트리(Claude 작성, 학습자는 차이점 설명) → 5단계 비교 + `dict` 비교
+- 다음 할 일: B+트리를 시작한다. 클래스가 왜 필요한지부터, 문제를 먼저 보여 준다.
 - 파일 구조: `tools.py`(make_data, seed 2400 고정 후 shuffle), `linear.py`(insert, select_eq, select_range, measure_* 함수), `hash.py`/`btree.py`/`bplustree.py`는 빈 파일
 - 다음 할 일: 해시 단계에서는 측정할 때 반드시 `insert`로 넣어서 구조를 만들게 한다(선형 단계에서는 `table = make_data(n)`으로 건너뛰었다).
 
