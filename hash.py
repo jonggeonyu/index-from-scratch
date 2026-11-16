@@ -54,16 +54,16 @@ def measure_select_eq(n):
     end = time.perf_counter()
     print(f"{n}개 : {(end-start)/1000}")
 
-def measure_select_range(n):
+def measure_select_range(n, width=100):
     buckets = make_table(n)
     lst = make_data(n)
     for rec in lst:
         insert(buckets, rec)
     keys = []
     for _ in range(1000):
-        keys.append(random.randint(0, n))
+        keys.append(random.randint(0, n-width))
     start = time.perf_counter()
     for i in range(1000):
-        lst = select_range(buckets, 0, n)
+        lst = select_range(buckets, keys[i], keys[i]+width)
     end = time.perf_counter()
-    print(f"{n}개 : {(end-start)/1000}")
+    print(f"n={n}, 폭={width} : {(end-start)/1000}")
