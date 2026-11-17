@@ -3,7 +3,10 @@
 ## 현재 위치
 - **2단계 (해시) 완료, 3단계 (B+트리) 시작 전**
 - 순서를 바꿨다: 3단계 B+트리(학습자 구현) → 4단계 B-트리(Claude 작성, 학습자는 차이점 설명) → 5단계 비교 + `dict` 비교
-- 다음 할 일: B+트리를 시작한다. 클래스가 왜 필요한지부터, 문제를 먼저 보여 준다.
+- 3단계 개념 ①~④를 완료했다. 정렬 리스트의 insert는 O(n), 이진 탐색은 약 20번(log n), BST는 쏠림 문제가 있다, B-트리는 노드당 100개면 3층, 분할 시 가운데 key가 위로 간다, B+트리는 데이터가 리프에만 있고 리프가 연결되어 범위 검색이 O(log n + k)다.
+- 시각화: `tree_viz.html` (아티팩트 https://claude.ai/artifact/PAzxj6hGRo1o33FYhgKFTJ ). 분할 규칙: B-트리는 4개 중 index 1을 이동, B+ 리프는 앞 2개와 뒤 2개로 나누고 뒤의 첫 key를 복사, B+ 내부 노드는 index 1을 이동한다.
+- ⑤ 클래스는 학습자가 혼자 공부해서 건너뛰었다.
+- 다음 할 일: ⑥ B+트리 구현. 먼저 노드 클래스를 설계한다(필요한 속성을 학습자가 정한다).
 - 파일 구조: `tools.py`(make_data, seed 2400 고정 후 shuffle), `linear.py`(insert, select_eq, select_range, measure_* 함수), `hash.py`/`btree.py`/`bplustree.py`는 빈 파일
 - 다음 할 일: 해시 단계에서는 측정할 때 반드시 `insert`로 넣어서 구조를 만들게 한다(선형 단계에서는 `table = make_data(n)`으로 건너뛰었다).
 
