@@ -25,3 +25,11 @@ class BPlusTree:
                 i += 1
             node = node.children[i]
         return node
+
+    def insert(self, key, value):
+        leaf = self.find_leaf(key)
+        i = 0
+        while i < len(leaf.keys) and key > leaf.keys[i]:
+            i += 1
+        leaf.keys.insert(i, key)
+        leaf.values.insert(i, value)
