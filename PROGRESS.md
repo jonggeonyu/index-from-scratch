@@ -1,14 +1,20 @@
 # 진행 기록
 
 ## 현재 위치
-- **2단계 (해시) 완료, 3단계 (B+트리) 시작 전**
-- 순서를 바꿨다: 3단계 B+트리(학습자 구현) → 4단계 B-트리(Claude 작성, 학습자는 차이점 설명) → 5단계 비교 + `dict` 비교
-- 3단계 개념 ①~④를 완료했다. 정렬 리스트의 insert는 O(n), 이진 탐색은 약 20번(log n), BST는 쏠림 문제가 있다, B-트리는 노드당 100개면 3층, 분할 시 가운데 key가 위로 간다, B+트리는 데이터가 리프에만 있고 리프가 연결되어 범위 검색이 O(log n + k)다.
-- 시각화: `tree_viz.html` (아티팩트 https://claude.ai/artifact/PAzxj6hGRo1o33FYhgKFTJ ). 분할 규칙: B-트리는 4개 중 index 1을 이동, B+ 리프는 앞 2개와 뒤 2개로 나누고 뒤의 첫 key를 복사, B+ 내부 노드는 index 1을 이동한다.
-- ⑤ 클래스는 학습자가 혼자 공부해서 건너뛰었다.
-- 다음 할 일: ⑥ B+트리 구현. 먼저 노드 클래스를 설계한다(필요한 속성을 학습자가 정한다).
-- 파일 구조: `tools.py`(make_data, seed 2400 고정 후 shuffle), `linear.py`(insert, select_eq, select_range, measure_* 함수), `hash.py`/`btree.py`/`bplustree.py`는 빈 파일
-- 다음 할 일: 해시 단계에서는 측정할 때 반드시 `insert`로 넣어서 구조를 만들게 한다(선형 단계에서는 `table = make_data(n)`으로 건너뛰었다).
+- **3단계 (B+트리) 구현 완료, 4단계 (B-트리) 코드 완성. 측정 전**
+- 순서: 3단계 B+트리(학습자 구현) → 4단계 B-트리(Claude 작성, 학습자는 차이점 2~3곳 설명) → 5단계 비교 + `dict` 비교
+- 3단계 개념 ①~④ 완료. 시각화: `tree_viz.html` (아티팩트 https://claude.ai/artifact/PAzxj6hGRo1o33FYhgKFTJ )
+- 파일 구조:
+  - `tools.py`: `make_data` (seed 2400 고정 후 shuffle)
+  - `linear.py`, `hash.py`: 구현 + `measure_*` 함수 (값을 return한다)
+  - `bplustree.py`: Node, BPlusTree(find_path, insert, split_leaf, split_internal, select_eq, select_range) + `measure_*`, `MAX_KEYS = 64`
+  - `btree.py`: BTree(split 하나로 리프/내부 공통, select_range는 중위 순회) + `measure_*`, `MAX_KEYS = 64`
+  - `measure_time.py`: 4개 자료구조 × 3개 작업을 n=1천~100만으로 한 번에 측정해 표로 출력
+- 2026-11-17 Claude가 테스트함: 두 트리 모두 MAX_KEYS 3과 64에서 select_eq/select_range 결과가 정확했다.
+- 다음 할 일:
+  1. 측정 전 예측: n이 1000배 커질 때 B+트리 select_eq는 몇 배 느려질까?
+  2. `measure_time.py` 실행 → 결과 표에 B-트리, B+트리 행 추가
+  3. B-트리와 B+트리의 다른 부분 2~3곳을 학습자가 설명한다 (내부 노드의 values, 분할 규칙, next 없는 범위 검색)
 
 ## 완료 기록
 ### 2026-11-15 세션 1: 수준 확인 + 실험 설계
@@ -32,6 +38,13 @@
 - select_range가 중간에 멈출 수 없는 이유: 데이터가 섞여 있어서다. 이것은 트리 단계의 "정렬" 이야기로 이어진다.
 - 측정 함수를 `measure_*(n)` 형태로 스스로 정리했다. 랜덤 key를 타이머 밖에서 미리 만드는 것도 스스로 챙겼다.
 - insert 처음 측정 때 make_data를 감싸는 실수를 했다가 직접 고쳤다.
+
+### 2026-11-17 세션 3: 3단계 (B+트리 구현)
+- 클래스 문법은 혼자 공부해서 건너뛰었다. Node 속성(keys, is_leaf, children, values, next)을 학습자가 정했다.
+- find_leaf → find_path로 바꿔 (리프, 조상 경로)를 돌려주게 했다. 부모 포인터 대신 경로를 기록하는 방식을 골랐다.
+- find_leaf 버그 2개(`node.self.is_leaf`, `i <= len`)를 힌트를 받고 직접 고쳤다.
+- split_leaf(복사), split_internal(이동), 위로 반복하는 insert, 루트 분할, next를 따라가는 select_range를 구현했다.
+- 저장소 정리: `.gitignore` 추가(`__pycache__`), README를 UTF-8로 변환했다.
 
 ## 측정 결과
 (단계마다 추가)
