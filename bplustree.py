@@ -36,6 +36,31 @@ class BPlusTree:
         leaf.keys.insert(i, key)
         leaf.values.insert(i, value)
 
+        # 1. 리프가 넘치지 않으면 끝
+        if len(leaf.keys) <= MAX_KEYS:
+            return
+        up_key, right = self.split_leaf(leaf)
+        left = leaf
+
+        # 2. 부모로 올리기 (넘치면 위로 반복)
+        while path:
+            parent = path.pop()
+            j = 0
+            while j < len(parent.keys) and up_key >= parent.keys[j]:
+                j += 1
+            parent.keys.insert(j, up_key)
+            parent.children.insert(j + 1, right)
+            if len(parent.keys) <= MAX_KEYS:
+                return
+            up_key, right = self.split_internal(parent)
+            left = parent
+
+        # 3. 루트까지 분할됨 → 새 루트
+        new_root = Node(False)
+        new_root.keys = [up_key]
+        new_root.children = [left, right]
+        self.root = new_root
+
     def split_leaf(self, leaf):
         mid = len(leaf.keys) // 2 
         right = Node(True)
@@ -57,3 +82,22 @@ class BPlusTree:
         node.keys = node.keys[:mid]          
         node.children = node.children[:mid+1]
         return up_key, right
+
+    def select_eq(self, key):
+        leaf, _ = self.find_path(key)
+        for i in range(len(leaf.keys)):
+            if leaf.keys[i] == key:
+                return (key, leaf.values[i])
+        return None
+
+    def select_range(self, low, high):
+        lst = []
+        leaf, _ = self.find_path(low)
+        while leaf:
+            for i in range(len(leaf.keys)):
+                if leaf.keys[i] >= high:
+                    return lst
+                if leaf.keys[i] >= low:
+                    lst.append((leaf.keys[i], leaf.values[i]))
+            leaf = leaf.next
+        return lst
