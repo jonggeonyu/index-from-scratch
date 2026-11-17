@@ -38,7 +38,7 @@ def measure_insert(n):
     for rec in data:
         insert(buckets, rec)
     end = time.perf_counter()
-    print(f"{n}개 : {end - start}")
+    return end - start
 
 def measure_select_eq(n):
     buckets = make_table(n)
@@ -52,7 +52,7 @@ def measure_select_eq(n):
     for key in keys:
         select_eq(buckets, key)
     end = time.perf_counter()
-    print(f"{n}개 : {(end-start)/1000}")
+    return (end - start) / 1000
 
 def measure_select_range(n, width=100):
     buckets = make_table(n)
@@ -66,4 +66,4 @@ def measure_select_range(n, width=100):
     for i in range(1000):
         lst = select_range(buckets, keys[i], keys[i]+width)
     end = time.perf_counter()
-    print(f"n={n}, 폭={width} : {(end-start)/1000}")
+    return (end - start) / 1000

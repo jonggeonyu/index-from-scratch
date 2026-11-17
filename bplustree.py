@@ -2,7 +2,7 @@ from tools import make_data
 import random
 import time
 
-MAX_KEYS = 3
+MAX_KEYS = 64
 
 class Node:
     def __init__(self, is_leaf):
