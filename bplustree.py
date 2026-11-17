@@ -57,5 +57,3 @@ class BPlusTree:
         node.keys = node.keys[:mid]          
         node.children = node.children[:mid+1]
         return up_key, right
-
-    
