@@ -17,17 +17,19 @@ class BPlusTree:
     def __init__(self):
         self.root = Node(True)
 
-    def find_leaf(self, key):
+    def find_path(self, key):
         node = self.root
+        path = []
         while not node.is_leaf:
             i = 0
             while i < len(node.keys) and key >= node.keys[i]:
                 i += 1
+            path.append(node)
             node = node.children[i]
-        return node
+        return node, path
 
     def insert(self, key, value):
-        leaf = self.find_leaf(key)
+        leaf, path = self.find_path(key)
         i = 0
         while i < len(leaf.keys) and key > leaf.keys[i]:
             i += 1
