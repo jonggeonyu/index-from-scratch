@@ -1,4 +1,6 @@
 from tools import make_data
+import random
+import time
 
 MAX_KEYS = 3
 
@@ -101,3 +103,43 @@ class BPlusTree:
                     lst.append((leaf.keys[i], leaf.values[i]))
             leaf = leaf.next
         return lst
+
+
+# 트리 생성
+def build_tree(n):
+    tree = BPlusTree()
+    for rec in make_data(n):
+        tree.insert(rec[0], rec[1])
+    return tree
+
+# 측정 함수 3개
+def measure_insert(n):
+    data = make_data(n)
+    tree = BPlusTree()
+    start = time.perf_counter()
+    for rec in data:
+        tree.insert(rec[0], rec[1])
+    end = time.perf_counter()
+    return end - start
+
+def measure_select_eq(n):
+    tree = build_tree(n)
+    keys = []
+    for i in range(1000):
+        keys.append(random.randint(0, n-1))
+    start = time.perf_counter()
+    for i in range(1000):
+        tree.select_eq(keys[i])
+    end = time.perf_counter()
+    return (end - start) / 1000
+
+def measure_select_range(n, width=100):
+    tree = build_tree(n)
+    keys = []
+    for i in range(1000):
+        keys.append(random.randint(0, n-width))
+    start = time.perf_counter()
+    for i in range(1000):
+        tree.select_range(keys[i], keys[i]+width)
+    end = time.perf_counter()
+    return (end - start) / 1000
