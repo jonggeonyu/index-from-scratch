@@ -133,7 +133,7 @@ def measure_select_eq(n):
     end = time.perf_counter()
     return (end - start) / 1000
 
-def measure_select_range(n, width=100):
+def measure_select_range(n, width):
     tree = build_tree(n)
     keys = []
     for i in range(1000):
