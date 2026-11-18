@@ -1,4 +1,9 @@
+import math
 import matplotlib.pyplot as plt
+from matplotlib.ticker import FuncFormatter
+
+plt.rcParams["font.family"] = "Malgun Gothic"   # 한글 글꼴 (Windows)
+plt.rcParams["axes.unicode_minus"] = False      # 마이너스 기호 깨짐 방지
 
 # measure_count.py 결과 (n = 100만 고정, 찾는 개수 k만 증가)
 K = [100, 1000, 10000, 100000]
@@ -14,7 +19,7 @@ EQ = {
 # 레코드 k개가 든 범위를 한 번 검색하는 시간(초). Hash는 버킷 전체를 훑는 scan 방식이다.
 RANGE = {
     "Linear": [6.22e-01, 6.19e-01, 6.20e-01, 6.30e-01],
-    "Hash (scan)": [4.26e-01, 4.40e-01, 4.30e-01, 4.40e-01],
+    "Hash": [4.26e-01, 4.40e-01, 4.30e-01, 4.40e-01],
     "B tree": [7.05e-05, 4.66e-04, 5.05e-03, 7.58e-02],
     "B plus tree": [2.84e-05, 1.55e-04, 4.24e-03, 2.55e-02],
 }
@@ -34,6 +39,10 @@ def draw(data, title, filename):
     # 값이 1e-5 ~ 1e+2로 퍼져 있어서 로그 축을 쓴다. 기울기 = 복잡도
     plt.xscale("log")
     plt.yscale("log")
+    # 로그 눈금 숫자를 일반 글자로 쓴다 (기본 10^-4 수식 표기는 한글 글꼴에서 − 기호가 깨진다)
+    plt.xticks(K, [f"{x:,}" for x in K])
+    plt.gca().yaxis.set_major_formatter(
+        FuncFormatter(lambda v, _: f"1e{round(math.log10(v))}"))
     plt.xlabel("k (records to find)")
     plt.ylabel("time (s)")
     plt.title(title)
@@ -43,6 +52,6 @@ def draw(data, title, filename):
     print(f"saved: {filename}")
 
 
-draw(EQ, "select_eq: k random keys, total time (n=1,000,000)", "count_eq.png")
-draw(RANGE, "select_range: one range with k records (n=1,000,000)", "count_range.png")
+draw(EQ, "select_eq, 등호 검색 (n=1,000,000)", "count_eq.png")
+draw(RANGE, "select_range, 범위 검색 (n=1,000,000)", "count_range.png")
 plt.show()
