@@ -1,9 +1,8 @@
-import math
 import matplotlib.pyplot as plt
-from matplotlib.ticker import FuncFormatter
 
-plt.rcParams["font.family"] = "Malgun Gothic"   # 한글 글꼴 (Windows)
-plt.rcParams["axes.unicode_minus"] = False      # 마이너스 기호 깨짐 방지
+# 한글은 제목에만 있으므로 제목에만 한글 글꼴(Malgun Gothic)을 쓴다.
+# 전체를 한글 글꼴로 바꾸면 로그 눈금(10^-4)의 − 기호가 깨진다.
+KOREAN_FONT = "Malgun Gothic"
 
 # measure_count.py 결과 (n = 100만 고정, 찾는 개수 k만 증가)
 K = [100, 1000, 10000, 100000]
@@ -39,13 +38,10 @@ def draw(data, title, filename):
     # 값이 1e-5 ~ 1e+2로 퍼져 있어서 로그 축을 쓴다. 기울기 = 복잡도
     plt.xscale("log")
     plt.yscale("log")
-    # 로그 눈금 숫자를 일반 글자로 쓴다 (기본 10^-4 수식 표기는 한글 글꼴에서 − 기호가 깨진다)
     plt.xticks(K, [f"{x:,}" for x in K])
-    plt.gca().yaxis.set_major_formatter(
-        FuncFormatter(lambda v, _: f"1e{round(math.log10(v))}"))
     plt.xlabel("k (records to find)")
     plt.ylabel("time (s)")
-    plt.title(title)
+    plt.title(title, fontfamily=KOREAN_FONT)
     plt.grid(True, which="major", alpha=0.3)
     plt.legend()
     plt.savefig(filename, dpi=120, bbox_inches="tight")
