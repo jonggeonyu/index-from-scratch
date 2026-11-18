@@ -20,3 +20,6 @@
 <br></br>
 <img src="count_eq.png"> 
 <!-- <img src="count_eq_hb.png">  -->
+
+⨳ 범위 연산 : B+ tree >>> Hash table
+⨳ 등호 연산 : Hash table >>> B+ tree
