@@ -1,20 +1,20 @@
 # 진행 기록
 
 ## 현재 위치
-- **3단계 (B+트리) 구현 완료, 4단계 (B-트리) 코드 완성. 측정 전**
-- 순서: 3단계 B+트리(학습자 구현) → 4단계 B-트리(Claude 작성, 학습자는 차이점 2~3곳 설명) → 5단계 비교 + `dict` 비교
-- 3단계 개념 ①~④ 완료. 시각화: `tree_viz.html` (아티팩트 https://claude.ai/artifact/PAzxj6hGRo1o33FYhgKFTJ )
+- **구현, 측정, 개념 공부 완료. 지금은 발표 자료용 README 작성 단계 (2026-11-18부터)**
+- README 현재 상태: 제목(`# index-from-scratch`)과 그래프 2개(`count_eq.png`, `count_range.png`)를 나란히 넣은 것만 있다.
+- 다음 할 일: README의 구성(섹션 순서, 발표에서 강조할 점)을 학습자와 정한다.
 - 파일 구조:
   - `tools.py`: `make_data` (seed 2400 고정 후 shuffle)
-  - `linear.py`, `hash.py`: 구현 + `measure_*` 함수 (값을 return한다)
-  - `bplustree.py`: Node, BPlusTree(find_path, insert, split_leaf, split_internal, select_eq, select_range) + `measure_*`, `MAX_KEYS = 64`
-  - `btree.py`: BTree(split 하나로 리프/내부 공통, select_range는 중위 순회) + `measure_*`, `MAX_KEYS = 64`
-  - `measure_time.py`: 4개 자료구조 × 3개 작업을 n=1천~100만으로 한 번에 측정해 표로 출력
-- 2026-11-17 Claude가 테스트함: 두 트리 모두 MAX_KEYS 3과 64에서 select_eq/select_range 결과가 정확했다.
-- 다음 할 일:
-  1. 측정 전 예측: n이 1000배 커질 때 B+트리 select_eq는 몇 배 느려질까?
-  2. `measure_time.py` 실행 → 결과 표에 B-트리, B+트리 행 추가
-  3. B-트리와 B+트리의 다른 부분 2~3곳을 학습자가 설명한다 (내부 노드의 values, 분할 규칙, next 없는 범위 검색)
+  - `linear.py`, `hash.py`: 구현 + `measure_*` 함수. `hash.py`에는 범위 검색 2가지(key별 등호 검색 O(k), 전체 훑기 `select_range_scan` O(n))가 있다.
+  - `bplustree.py`: 학습자 구현. `MAX_KEYS = 64`
+  - `btree.py`: Claude 작성. `MAX_KEYS = 64`
+  - `measure_time.py`: 4개 자료구조 × 3개 작업, n=1천~100만
+  - `measure_sparse.py`: key 간격 100(gap)으로 띄엄띄엄, 해시 버킷 수는 n 이상의 소수
+  - `measure_count.py`: n=100만 고정, 찾는 개수 k만 100~10만으로 늘림 (해시 범위 검색은 scan)
+  - `plot_count.py`: `measure_count.py` 결과를 `count_eq.png`, `count_range.png`로 그린다 (y축은 초, 로그 축)
+  - 그래프는 `.venv` 가상 환경의 matplotlib 3.11.2로 그린다.
+- 하지 않고 넘어간 것: B-트리와 B+트리의 차이 2~3곳을 학습자가 자기 말로 설명하기, 해시 직접 구현과 `dict` 비교. 필요하면 README를 쓰면서 다시 다룬다.
 
 ## 완료 기록
 ### 2026-11-15 세션 1: 수준 확인 + 실험 설계
@@ -46,21 +46,53 @@
 - split_leaf(복사), split_internal(이동), 위로 반복하는 insert, 루트 분할, next를 따라가는 select_range를 구현했다.
 - 저장소 정리: `.gitignore` 추가(`__pycache__`), README를 UTF-8로 변환했다.
 
-## 측정 결과
-(단계마다 추가)
+### 2026-11-17 ~ 11-18 세션 4: 측정, 그래프, 정리
+- B-트리(`btree.py`)는 Claude가 작성했다. 두 트리 모두 MAX_KEYS 3과 64에서 결과가 정확한지 테스트했다.
+- `measure_time.py`, `measure_sparse.py`, `measure_count.py`로 측정했다.
+- `.venv` 가상 환경을 만들고 matplotlib을 설치했다(`.gitignore`에 `.venv/` 추가).
+- `plot_count.py`로 그래프 2개를 그렸다. 로그 눈금의 마이너스가 깨지는 문제는 한글 글꼴을 제목에만 쓰는 방식으로 해결했다.
+- README에 그래프 2개를 나란히 넣었다(`<img width="49%">` 2개를 한 줄에).
+- 학습자 판단으로 측정과 공부를 마치고 README(발표 자료) 작성으로 넘어갔다.
 
-단위: insert는 n개 전체(초), select는 1번당 평균(초)
+## 측정 결과
+README에 쓸 기준 값이다. 단위는 모두 초다.
+
+### measure_time.py (2026-11-17): n을 늘린다
+insert는 n개 전체 시간, select는 1번당 평균(1,000번), 범위 폭은 100이다.
 
 | 자료구조 | 작업 | 1천 | 1만 | 10만 | 100만 |
 |---|---|---|---|---|---|
-| 선형 | insert (전체) | 7.35e-05 | 5.06e-04 | 7.72e-03 | 1.52e-01 |
-| 선형 | select_eq | 2.13e-05 | 1.98e-04 | 3.98e-03 | 7.86e-02 |
-| 선형 | select_range | 4.89e-05 | 6.33e-04 | 1.20e-02 | 2.17e-01 |
-| 해시 (직접 구현, m=n) | insert (전체) | 1.41e-04 | 2.27e-03 | 9.11e-02 | 8.02e-01 |
-| 해시 (직접 구현, m=n) | select_eq | 3.50e-07 | 3.98e-07 | 8.54e-07 | 1.24e-06 |
-| 해시 (직접 구현, m=n) | select_range (폭 100) | 2.25e-05 | 1.61e-05 | 2.55e-05 | 5.08e-05 |
+| 선형 | insert (전체) | 7.97e-05 | 5.83e-04 | 1.03e-02 | 1.75e-01 |
+| 선형 | select_eq | 1.48e-05 | 1.40e-04 | 3.50e-03 | 8.22e-02 |
+| 선형 | select_range | 7.34e-05 | 5.06e-04 | 7.98e-03 | 1.65e-01 |
+| 해시 (m=n) | insert (전체) | 1.30e-04 | 1.27e-03 | 4.48e-02 | 7.24e-01 |
+| 해시 (m=n) | select_eq | 3.58e-07 | 8.02e-07 | 6.55e-07 | 8.10e-07 |
+| 해시 (m=n) | select_range (key별 등호 검색) | 7.17e-06 | 8.28e-06 | 1.99e-05 | 3.24e-05 |
+| B-트리 | insert (전체) | 1.67e-03 | 2.40e-02 | 3.23e-01 | 5.71e+00 |
+| B-트리 | select_eq | 2.25e-06 | 3.25e-06 | 4.35e-06 | 7.83e-06 |
+| B-트리 | select_range | 1.66e-05 | 1.14e-05 | 1.53e-05 | 2.55e-05 |
+| B+트리 | insert (전체) | 1.53e-03 | 2.64e-02 | 3.57e-01 | 5.14e+00 |
+| B+트리 | select_eq | 1.34e-06 | 1.99e-06 | 3.63e-06 | 7.24e-06 |
+| B+트리 | select_range | 8.69e-06 | 9.71e-06 | 2.83e-05 | 2.07e-05 |
 
+### measure_count.py: n=100만 고정, 찾는 개수 k를 늘린다
+select_eq는 랜덤 key k개를 모두 찾는 전체 시간, select_range는 레코드 k개가 든 범위 1번(10번 평균)이다. 해시 범위 검색은 scan 방식이다. 선형 select_eq는 k=1만부터 너무 오래 걸려 측정하지 않았다.
+
+| 자료구조 | 작업 | k=100 | k=1천 | k=1만 | k=10만 |
+|---|---|---|---|---|---|
+| 선형 | select_eq | 1.61e+01 | 1.75e+02 | - | - |
+| 선형 | select_range | 6.22e-01 | 6.19e-01 | 6.20e-01 | 6.30e-01 |
+| 해시 | select_eq | 2.41e-04 | 1.76e-03 | 1.51e-02 | 1.49e-01 |
+| 해시 (scan) | select_range | 4.26e-01 | 4.40e-01 | 4.30e-01 | 4.40e-01 |
+| B-트리 | select_eq | 2.81e-03 | 4.93e-02 | 1.77e-01 | 1.93e+00 |
+| B-트리 | select_range | 7.05e-05 | 4.66e-04 | 5.05e-03 | 7.58e-02 |
+| B+트리 | select_eq | 9.16e-04 | 7.06e-03 | 5.67e-02 | 6.56e-01 |
+| B+트리 | select_range | 2.84e-05 | 1.55e-04 | 4.24e-03 | 2.55e-02 |
+
+### 이전 측정 (2026-11-16, 선형/해시 단계)
 해시 select_range의 범위 폭을 바꾼 측정(n=100만 고정): 폭 100은 3.87e-05, 폭 1000은 3.69e-04, 폭 10000은 3.54e-03 → O(k)
+
+`measure_sparse.py` 결과는 아직 기록하지 않았다.
 
 ## 나중에 볼 목록
 - n이 10만~100만으로 커지면 1개당 시간이 약 2배로 늘어난다(insert, select 모두). 메모리나 CPU 캐시 효과로 추정되지만 확인하지 않았다.
