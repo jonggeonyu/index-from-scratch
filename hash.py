@@ -31,6 +31,16 @@ def select_range(table, low, high):
                 lst.append(rec)
     return lst
 
+def select_range_scan(table, low, high):
+    # key 후보를 나열할 수 없을 때(문자열, 실수 등)의 방식:
+    # 버킷 전체를 훑으며 범위 안인지 검사한다 → O(n)
+    lst = []
+    for bucket in table:
+        for rec in bucket:
+            if low <= rec[0] < high:
+                lst.append(rec)
+    return lst
+
 def measure_insert(n):
     data = make_data(n)
     buckets = make_table(n)
