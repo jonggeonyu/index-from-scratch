@@ -12,8 +12,9 @@ def hash_scan_ops(n):
             hash.select_eq,
             hash.select_range_scan)
 
-# 해시 바로 다음에 "Hash (scan)"을 끼워 넣는다
-STRUCTURES = STRUCTURES[:2] + [("Hash (scan)", hash_scan_ops)] + STRUCTURES[2:]
+# 원래 해시(정수 key를 하나씩 등호 검색) 자리를 "Hash (scan)"으로 바꾼다
+# (표에는 "Hash"로 표시한다. 범위 검색은 scan 방식)
+STRUCTURES = STRUCTURES[:1] + [("Hash", hash_scan_ops)] + STRUCTURES[2:]
 
 # 실험 설정: 저장된 데이터 수 n과 gap은 고정하고,
 # "찾아야 하는 레코드 수"(k)만 10배씩 늘린다
@@ -65,7 +66,7 @@ def measure_count(name, make_ops):
 def run(name, make_ops):
     eq_results, range_results = measure_count(name, make_ops)
     print()
-    print(f"===== {name} (n={N:,}, gap={GAP}) =====")
+    print(f"===== {name} (n={N:,}) =====")
     header = f"{'op':<22}" + "".join(f"{'k=' + format(c, ','):>14}" for c in COUNTS)
     print(header)
     print("-" * 78)
